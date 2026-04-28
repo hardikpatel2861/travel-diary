@@ -1,0 +1,195 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Travel Diary</title>
+    <style>
+    body {
+        font-family: Arial;
+        background: #f2f3f6;
+        margin: 0;
+    }
+
+    .navbar {
+        background: #222;
+        color: white;
+        padding: 15px;
+        position: relative;
+    }
+
+    .navbar h2 {
+        text-align: center;
+        margin: 0;
+    }
+
+    /* USER NAME LEFT */
+    .user {
+        position: absolute;
+        left: 20px;
+        top: 15px;
+    }
+
+    /* LOGOUT RIGHT */
+    .logout {
+        position: absolute;
+        right: 20px;
+        top: 10px;
+    }
+
+    .logout button {
+        background: red;
+        color: white;
+        padding: 8px 15px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* CENTER CONTENT */
+    .content {
+        padding: 20px;
+        width: 70%;
+        margin: auto;
+        text-align: center;
+    }
+
+    /* GRID */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        width: 100%;
+    }
+
+    .card {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px gray;
+        text-align: center;
+        position: relative;
+    }
+
+    .card img {
+    
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 200px;
+        background: rgba(0,0,0,0.6);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        border-radius: 10px;
+        transition: 0.3s;
+    }
+
+    .card:hover .overlay {
+        opacity: 1;
+    }
+
+    input, textarea {
+        width: 80%;
+        padding: 10px;
+        margin: 10px auto;
+        display: block;
+    }
+
+    button {
+        padding: 10px 20px;
+        color: white;
+        border: none;
+        margin: 10px auto;
+        display: block;
+        cursor: pointer;
+    }
+
+    .add-btn { background: green; }
+    .edit-btn { background: green; }
+    .delete-btn { background: red; }
+
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+
+    <!-- USERNAME -->
+    <div class="user">
+        Welcome {{ request.user.username }}
+    </div>
+
+    <h2>My Travel Diary</h2>
+
+    <!-- LOGOUT BUTTON -->
+    <div class="logout">
+        <a href="/logout/">
+            <button>Logout</button>
+        </a>
+    </div>
+
+</div>
+
+<div class="content">
+
+    <h2>Add New Trip</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Enter Trip Title" required>
+        <textarea name="desc" placeholder="Enter Description" required></textarea>
+        <input type="file" name="image">
+        <button class="add-btn" type="submit">Add Trip</button>
+    </form>
+
+    <h2>Your Trips</h2>
+
+    <div class="grid">
+
+    {% for trip in trips %}
+
+        <div class="card">
+
+            {% if trip.image %}
+                <img src="{{ trip.image.url }}">
+                <div class="overlay">
+                    <h3>{{ trip.title }}</h3>
+                </div>
+            {% endif %}
+
+            <p>{{ trip.desc }}</p>
+
+            <a href="/edit/{{ trip.id }}/">
+                <button class="edit-btn">Edit</button>
+            </a>
+
+            <form action="/delete/{{ trip.id }}/" method="POST">
+                {% csrf_token %}
+                <button class="delete-btn">Delete</button>
+            </form>
+
+        </div>
+
+    {% empty %}
+        <p>No trips added yet</p>
+
+    {% endfor %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
